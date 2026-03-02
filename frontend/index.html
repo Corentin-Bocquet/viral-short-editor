@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Short Editor</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #1a1a24;
+            --bg-tertiary: #252532;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon {
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
+        }
+
+        .file-input-label.has-file {
+            border-color: var(--success);
+            border-style: solid;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--success);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .range-value {
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .toggle-label {
+            margin-bottom: 0;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background-color: var(--accent-primary);
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), #a855f7);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-step {
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .progress-percent {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .progress-bar-container {
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), #a855f7);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-message {
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border-radius: 12px;
+            border: 1px solid var(--success);
+            margin-bottom: 1rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent-primary);
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-card li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-card li:last-child {
+            border-bottom: none;
+        }
+
+        .info-card li:before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📱 Viral Short Editor</h1>
+            <p class="subtitle">Transforme tes vidéos brutes en Shorts viraux 9:16</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column: Upload Form -->
+            <div class="card">
+                <h2><span class="icon">🎥</span> Paramètres</h2>
+
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="videoFile">Vidéo brute (MP4, MOV, AVI)</label>
+                        <div class="input-wrapper">
+                            <input type="file" id="videoFile" accept="video/*" required>
+                            <label for="videoFile" class="file-input-label" id="videoLabel">
+                                <span class="icon">📁</span>
+                                <div>Clique pour uploader ta vidéo</div>
+                                <div class="file-name" id="videoFileName"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="musicFile">Musique de fond (optionnel)</label>
+                        <div class="input-wrapper">
+                            <input type="file" id="musicFile" accept="audio/*">
+                            <label for="musicFile" class="file-input-label" id="musicLabel">
+                                <span class="icon">🎵</span>
+                                <div>Ajouter une musique de fond</div>
+                                <div class="file-name" id="musicFileName"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="volumeGroup" style="display: none;">
+                        <label for="musicVolume">
+                            Volume musique
+                            <span class="range-value" id="volumeValue">10%</span>
+                        </label>
+                        <input type="range" id="musicVolume" min="0" max="100" value="10">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle-wrapper">
+                            <label class="toggle-label">Ajouter des B-rolls IA 🤖</label>
+                            <label class="toggle">
+                                <input type="checkbox" id="enableBrolls">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Insère automatiquement des clips visuels pertinents (nécessite clé Pexels)
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="processBtn">
+                        🚀 Générer mon Short
+                    </button>
+                </form>
+
+                <!-- Progress Container -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-header">
+                        <div class="progress-step" id="progressStep">Initialisation...</div>
+                        <div class="progress-percent" id="progressPercent">0%</div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-message" id="progressMessage">Préparation...</div>
+                </div>
+
+                <!-- Error Container -->
+                <div class="error-message" id="errorContainer" style="display: none;"></div>
+
+                <!-- Result Container -->
+                <div class="result-container" id="resultContainer">
+                    <div class="success-message">
+                        <div class="success-icon">✅</div>
+                        <h3>Ton Short est prêt !</h3>
+                        <p>Vidéo optimisée en format 9:16 avec sous-titres incrustés</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="downloadBtn">
+                            ⬇️ Télécharger MP4
+                        </button>
+                        <button class="btn btn-secondary" id="downloadSubsBtn">
+                            📝 Télécharger SRT
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary" id="newVideoBtn" style="margin-top: 1rem;">
+                        🔄 Nouvelle vidéo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Info -->
+            <div class="card">
+                <h2><span class="icon">✨</span> Ce que fait l'app</h2>
+
+                <div class="info-card">
+                    <h3>🎬 Étape A : Recadrage + Nettoyage</h3>
+                    <ul>
+                        <li>Recadrage automatique en 9:16 (portrait)</li>
+                        <li>Détection et suppression des silences (Jump Cuts)</li>
+                        <li>Optimisation pour TikTok/Reels/Shorts</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>💬 Étape B : Sous-titres Viral Style</h3>
+                    <ul>
+                        <li>Transcription audio via Whisper AI</li>
+                        <li>Mots colorés (vert/rouge/jaune) selon sentiment</li>
+                        <li>Effet karaôké mot par mot</li>
+                        <li>Emojis automatiques tous les 4 lignes</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>🎥 Étape C : B-rolls Intel (si activé)</h3>
+                    <ul>
+                        <li>Analyse sémantique du contenu</li>
+                        <li>Recherche de clips visuels pertinents</li>
+                        <li>Insertion automatique sur 2 secondes</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>🎵 Étape D : Mixage Audio Pro</h3>
+                    <ul>
+                        <li>Auto-ducking de la musique pendant la voix</li>
+                        <li>Transitions fluides (300ms)</li>
+                        <li>Balance parfaite voix/musique</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(99, 102, 241, 0.1); border-radius: 8px; border: 1px solid var(--accent-primary);">
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        💡 <strong>Astuce Pro:</strong> Pour les B-rolls, crée un fichier <code>.env</code> avec ta clé Pexels API (gratuite sur <a href="https://www.pexels.com/api/" target="_blank" style="color: var(--accent-primary);">pexels.com</a>)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Made with 🔥 for content creators | Coco 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // API base URL
+        const API_URL = 'http://localhost:8000';
+        let currentJobId = null;
+
+        // DOM elements
+        const uploadForm = document.getElementById('uploadForm');
+        const videoFile = document.getElementById('videoFile');
+        const musicFile = document.getElementById('musicFile');
+        const videoLabel = document.getElementById('videoLabel');
+        const musicLabel = document.getElementById('musicLabel');
+        const videoFileName = document.getElementById('videoFileName');
+        const musicFileName = document.getElementById('musicFileName');
+        const musicVolume = document.getElementById('musicVolume');
+        const volumeValue = document.getElementById('volumeValue');
+        const volumeGroup = document.getElementById('volumeGroup');
+        const enableBrolls = document.getElementById('enableBrolls');
+        const processBtn = document.getElementById('processBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressStep = document.getElementById('progressStep');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressBar = document.getElementById('progressBar');
+        const progressMessage = document.getElementById('progressMessage');
+        const errorContainer = document.getElementById('errorContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadSubsBtn = document.getElementById('downloadSubsBtn');
+        const newVideoBtn = document.getElementById('newVideoBtn');
+
+        // File input handlers
+        videoFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                videoFileName.textContent = fileName;
+                videoLabel.classList.add('has-file');
+            }
+        });
+
+        musicFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                musicFileName.textContent = fileName;
+                musicLabel.classList.add('has-file');
+                volumeGroup.style.display = 'block';
+            } else {
+                musicFileName.textContent = '';
+                musicLabel.classList.remove('has-file');
+                volumeGroup.style.display = 'none';
+            }
+        });
+
+        // Volume slider
+        musicVolume.addEventListener('input', (e) => {
+            volumeValue.textContent = `${e.target.value}%`;
+        });
+
+        // Load preferences from localStorage
+        const loadPreferences = () => {
+            const prefs = JSON.parse(localStorage.getItem('viralShortPrefs') || '{}');
+            if (prefs.musicVolume !== undefined) {
+                musicVolume.value = prefs.musicVolume;
+                volumeValue.textContent = `${prefs.musicVolume}%`;
+            }
+            if (prefs.enableBrolls !== undefined) {
+                enableBrolls.checked = prefs.enableBrolls;
+            }
+        };
+
+        // Save preferences to localStorage
+        const savePreferences = () => {
+            const prefs = {
+                musicVolume: parseInt(musicVolume.value),
+                enableBrolls: enableBrolls.checked
+            };
+            localStorage.setItem('viralShortPrefs', JSON.stringify(prefs));
+        };
+
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Save preferences
+            savePreferences();
+
+            // Reset UI
+            errorContainer.style.display = 'none';
+            resultContainer.classList.remove('active');
+            progressContainer.classList.add('active');
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<span class="spinner"></span> Traitement en cours...';
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('video', videoFile.files[0]);
+            if (musicFile.files.length > 0) {
+                formData.append('music', musicFile.files[0]);
+            }
+            formData.append('music_volume', (musicVolume.value / 100).toString());
+            formData.append('enable_brolls', enableBrolls.checked.toString());
+
+            try {
+                // Start processing
+                const response = await fetch(`${API_URL}/api/process`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentJobId = data.job_id;
+
+                // Start listening to progress
+                listenToProgress(currentJobId);
+
+            } catch (error) {
+                showError(`Erreur lors du lancement: ${error.message}`);
+                resetUI();
+            }
+        });
+
+        // Listen to progress via SSE
+        const listenToProgress = (jobId) => {
+            const eventSource = new EventSource(`${API_URL}/api/progress/${jobId}`);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                // Update progress UI
+                progressStep.textContent = getStepName(data.step);
+                progressPercent.textContent = `${data.progress}%`;
+                progressBar.style.width = `${data.progress}%`;
+                progressMessage.textContent = data.message;
+
+                // Check status
+                if (data.status === 'done') {
+                    eventSource.close();
+                    showResult();
+                } else if (data.status === 'error') {
+                    eventSource.close();
+                    showError(data.error || 'Une erreur est survenue');
+                    resetUI();
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error('SSE error:', error);
+                eventSource.close();
+                showError('Erreur de connexion au serveur');
+                resetUI();
+            };
+        };
+
+        // Get human-readable step name
+        const getStepName = (step) => {
+            const steps = {
+                'init': '🔄 Initialisation',
+                'A': '✏️ Étape A: Recadrage',
+                'B': '💬 Étape B: Sous-titres',
+                'C': '🎥 Étape C: B-rolls',
+                'D': '🎵 Étape D: Mixage Audio',
+                'done': '✅ Terminé',
+                'error': '❌ Erreur'
+            };
+            return steps[step] || step;
+        };
+
+        // Show result
+        const showResult = () => {
+            progressContainer.classList.remove('active');
+            resultContainer.classList.add('active');
+            processBtn.disabled = false;
+            processBtn.innerHTML = '🚀 Générer mon Short';
+        };
+
+        // Show error
+        const showError = (message) => {
+            errorContainer.textContent = `❌ ${message}`;
+            errorContainer.style.display = 'block';
+        };
+
+        // Reset UI
+        const resetUI = () => {
+            progressContainer.classList.remove('active');
+            processBtn.disabled = false;
+            processBtn.innerHTML = '🚀 Générer mon Short';
+        };
+
+        // Download result
+        downloadBtn.addEventListener('click', () => {
+            if (currentJobId) {
+                window.location.href = `${API_URL}/api/result/${currentJobId}`;
+            }
+        });
+
+        // Download subtitles
+        downloadSubsBtn.addEventListener('click', () => {
+            if (currentJobId) {
+                window.location.href = `${API_URL}/api/subtitles/${currentJobId}`;
+            }
+        });
+
+        // New video
+        newVideoBtn.addEventListener('click', () => {
+            // Cleanup old job
+            if (currentJobId) {
+                fetch(`${API_URL}/api/cleanup/${currentJobId}`, { method: 'DELETE' })
+                    .catch(console.error);
+            }
+
+            // Reset form
+            uploadForm.reset();
+            videoFileName.textContent = '';
+            musicFileName.textContent = '';
+            videoLabel.classList.remove('has-file');
+            musicLabel.classList.remove('has-file');
+            volumeGroup.style.display = 'none';
+            resultContainer.classList.remove('active');
+            errorContainer.style.display = 'none';
+            currentJobId = null;
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Initialize
+        loadPreferences();
+    </script>
+</body>
+</html>
