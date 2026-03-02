@@ -1,0 +1,12 @@
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+openai-whisper==20231117
+moviepy==1.0.3
+python-multipart==0.0.6
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+requests==2.31.0
+numpy==1.26.3
+torch==2.1.2
+torchaudio==2.1.2
